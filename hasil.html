@@ -7,14 +7,6 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 
-<!-- EMAILJS -->
-<script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
-<script>
-(function(){
-  emailjs.init("PUBLIC_KEY_KAMU");
-})();
-</script>
-
 <style>
 * {
   box-sizing: border-box;
@@ -115,34 +107,6 @@ h1 {
 .action-buttons button:hover {
   background: #5a76e6;
 }
-
-/* EMAIL FORM */
-.email-box {
-  margin-top: 35px;
-  text-align: center;
-}
-
-.email-box input {
-  width: 100%;
-  max-width: 300px;
-  padding: 12px;
-  border-radius: 12px;
-  border: 1px solid #ccc;
-  margin-bottom: 12px;
-}
-
-.email-box button {
-  padding: 12px 30px;
-  border-radius: 22px;
-  border: none;
-  background: #4cd964;
-  color: #fff;
-  cursor: pointer;
-}
-
-.email-box button:hover {
-  background: #3cbf57;
-}
 </style>
 </head>
 
@@ -176,18 +140,7 @@ h1 {
 
   <div class="action-buttons">
     <button onclick="kembaliKeBeranda()">Kembali ke Beranda</button>
-    <button onclick="window.location.href='riwayat.html'">Lihat Riwayat</button>
-  </div>
-
-  <hr style="margin:35px 0">
-
-  <!-- EMAIL -->
-  <div class="email-box">
-    <h3>Kirim Hasil ke Email</h3>
-    <input id="emailName" placeholder="Nama Lengkap">
-    <input id="emailTo" placeholder="Email">
-    <br>
-    <button onclick="kirimEmail()">Kirim Email</button>
+    <button onclick="window.location.href='riwayat.html'">Lihat Riwayat Lengkap</button>
   </div>
 </div>
 
@@ -197,78 +150,82 @@ function kembaliKeBeranda() {
   window.location.href = "tes3.html";
 }
 
-let statusTextGlobal = "";
-let descTextGlobal = "";
-
 document.addEventListener("DOMContentLoaded", function () {
 
+  /* ===== DATA USER ===== */
   const userName  = localStorage.getItem("userName") || "Pengguna";
   const userEmail = localStorage.getItem("userEmail");
 
   document.getElementById("userInfo").innerText =
-    userEmail ? `Hasil tes atas nama ${userName} (${userEmail})` : "Hasil tes pengguna";
+    userEmail
+      ? `Hasil tes atas nama ${userName} (${userEmail})`
+      : "Hasil tes pengguna";
 
-  let stressScore = Number(localStorage.getItem("stressScore")) || 0;
+  /* ===== AMBIL SKOR ===== */
+  let stressScore = Number(localStorage.getItem("stressScore"));
+  if (isNaN(stressScore)) stressScore = 0;
 
   const bar = document.getElementById("progressBar");
   const percentText = document.getElementById("percentText");
   const resultText = document.getElementById("resultText");
   const descBox = document.getElementById("descBox");
 
+  let statusText = "";
   let barColor = "";
 
   if (stressScore <= 30) {
-    statusTextGlobal = "Stres Rendah";
-    descTextGlobal = "Kondisi emosional Anda tergolong stabil.";
+    statusText = "Stres Rendah 😊";
     barColor = "#4cd964";
+    descBox.innerText =
+      "Kondisi emosional Anda tergolong stabil dalam menjalani perkuliahan.";
   } else if (stressScore <= 70) {
-    statusTextGlobal = "Stres Sedang";
-    descTextGlobal = "Terdapat tanda stres ringan hingga sedang.";
+    statusText = "Stres Sedang 😐";
     barColor = "#f1c40f";
+    descBox.innerText =
+      "Anda menunjukkan tanda stres ringan hingga sedang yang berkaitan dengan aktivitas perkuliahan.";
   } else {
-    statusTextGlobal = "Stres Tinggi";
-    descTextGlobal = "Disarankan mencari bantuan profesional.";
+    statusText = "Stres Tinggi 😰";
     barColor = "#ff6b6b";
+    descBox.innerText =
+      "Terdapat indikasi stres tinggi yang kemungkinan dipicu oleh tekanan akademik.";
   }
 
-  resultText.innerText = statusTextGlobal;
+  resultText.innerText = statusText;
   resultText.style.color = barColor;
-  descBox.innerText = descTextGlobal;
 
   setTimeout(() => {
     bar.style.width = stressScore + "%";
     bar.style.background = barColor;
     percentText.innerText = stressScore + "%";
   }, 200);
-});
 
-function kirimEmail() {
-  const name = document.getElementById("emailName").value.trim();
-  const email = document.getElementById("emailTo").value.trim();
-  const skor = localStorage.getItem("stressScore");
+  /* ===== SIMPAN RIWAYAT (ANTI DUPLIKAT) ===== */
+  if (userEmail && !sessionStorage.getItem("savedOnce")) {
+    const historyKey = "stressHistory_" + userEmail;
+    let history = JSON.parse(localStorage.getItem(historyKey)) || [];
 
-  if (!name || !email) {
-    alert("Nama dan email wajib diisi");
-    return;
+    const now = new Date();
+    const tanggal =
+      now.toLocaleDateString("id-ID", {
+        day: "2-digit",
+        month: "long",
+        year: "numeric"
+      }) + " " +
+      now.toLocaleTimeString("id-ID", {
+        hour: "2-digit",
+        minute: "2-digit"
+      });
+
+    history.unshift({
+      tanggal,
+      status: statusText,
+      skor: stressScore
+    });
+
+    localStorage.setItem(historyKey, JSON.stringify(history));
+    sessionStorage.setItem("savedOnce", "true");
   }
-
-  emailjs.send(
-    "SERVICE_ID_KAMU",
-    "TEMPLATE_ID_KAMU",
-    {
-      name: name,
-      email: email,
-      skor: skor,
-      status: statusTextGlobal,
-      deskripsi: descTextGlobal
-    }
-  ).then(() => {
-    alert("Email berhasil dikirim!");
-  }).catch(err => {
-    alert("Gagal mengirim email");
-    console.error(err);
-  });
-}
+});
 </script>
 
 </body>
