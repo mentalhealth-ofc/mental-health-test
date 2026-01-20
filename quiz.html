@@ -173,10 +173,20 @@ function hitungHasil() {
     const maxScore = questions.length * 3;
     const percent = Math.round((totalScore / maxScore) * 100);
 
-    // SIMPAN KE LOCAL STORAGE (INI YANG DIBACA hasil.html)
-    localStorage.setItem("stressScore", percent);
+    let status = "";
+    if (percent <= 30) {
+        status = "Stres Rendah";
+    } else if (percent <= 70) {
+        status = "Stres Sedang";
+    } else {
+        status = "Stres Tinggi";
+    }
 
-    // PINDAH KE EMAIL
+    // SIMPAN HASIL UNTUK EMAIL & HASIL.HTML
+    localStorage.setItem("stressScore", percent);
+    localStorage.setItem("stressStatus", status);
+
+    // PINDAH KE HALAMAN EMAIL
     window.location.href = "email.html";
 }
 
@@ -186,4 +196,5 @@ loadQuestion();
 
 </body>
 </html>
+
 
