@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Quiz Kesehatan Mental</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+* {
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #c9f3ff, #e6fbff);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.container {
+    width: 100%;
+    max-width: 800px;
+    padding: 40px 20px;
+}
+
+.progress {
+    height: 6px;
+    background: #d6ecff;
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 40px;
+}
+
+.progress-bar {
+    height: 100%;
+    width: 0%;
+    background: #6a8dff;
+    transition: width 0.3s ease;
+}
+
+.question {
+    font-size: 22px;
+    margin-bottom: 40px;
+    text-align: center;
+}
+
+.option {
+    background: white;
+    padding: 18px;
+    margin-bottom: 18px;
+    border-radius: 14px;
+    cursor: pointer;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.12);
+    transition: all 0.3s ease;
+}
+
+.option:hover {
+    transform: translateY(-4px);
+}
+
+.nav {
+    margin-top: 40px;
+}
+
+.back-btn {
+    background: none;
+    border: none;
+    color: #4b6cff;
+    font-size: 14px;
+    cursor: pointer;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="progress">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <div class="question" id="questionText"></div>
+
+    <div id="options"></div>
+
+    <div class="nav">
+        <button class="back-btn" onclick="prevQuestion()">← Kembali</button>
+    </div>
+</div>
+
+<script>
+// ================= DATA =================
+const questions = [
+  "Saya merasa terbebani dengan tugas dan deadline kuliah.",
+  "Saya sering merasa cemas memikirkan nilai atau prestasi akademik.",
+  "Saya mengalami kesulitan tidur karena memikirkan tugas atau ujian.",
+  "Saya sering merasa kurang tidur akibat aktivitas perkuliahan.",
+  "Saya merasa lelah atau kehabisan energi secara emosional.",
+  "Saya merasa suasana hati saya mudah berubah selama menjalani kuliah.",
+  "Saya merasa kehilangan motivasi untuk mengikuti perkuliahan.",
+  "Saya sulit berkonsentrasi saat belajar atau mengerjakan tugas.",
+  "Saya merasa kewalahan dengan aktivitas akademik sehari-hari.",
+  "Saya merasa khawatir berlebihan tentang masa depan akademik saya."
+];
+
+
+// bobot nilai (0–3)
+const options = [
+    { text: "Tidak Pernah", value: 0 },
+    { text: "Kadang-kadang", value: 1 },
+    { text: "Sering", value: 2 },
+    { text: "Hampir Setiap Hari", value: 3 }
+];
+
+let current = 0;
+let answers = [];
+
+// ================= FUNCTION =================
+function loadQuestion() {
+    document.getElementById("questionText").innerText = questions[current];
+    const optDiv = document.getElementById("options");
+    optDiv.innerHTML = "";
+
+    options.forEach(opt => {
+        const div = document.createElement("div");
+        div.className = "option";
+        div.innerText = opt.text;
+        div.onclick = () => selectAnswer(opt.value);
+        optDiv.appendChild(div);
+    });
+
+    updateProgress();
+}
+
+function selectAnswer(score) {
+    answers[current] = score;
+
+    setTimeout(() => {
+        nextQuestion();
+    }, 250);
+}
+
+function nextQuestion() {
+    if (current < questions.length - 1) {
+        current++;
+        loadQuestion();
+    } else {
+        hitungHasil();
+    }
+}
+
+function prevQuestion() {
+    if (current > 0) {
+        current--;
+        loadQuestion();
+    }
+}
+
+function updateProgress() {
+    const percent = ((current + 1) / questions.length) * 100;
+    document.getElementById("progressBar").style.width = percent + "%";
+}
+
+// ================= HITUNG HASIL =================
+function hitungHasil() {
+    const totalScore = answers.reduce((a, b) => a + b, 0);
+    const maxScore = questions.length * 3;
+    const percent = Math.round((totalScore / maxScore) * 100);
+
+    // SIMPAN KE LOCAL STORAGE (INI YANG DIBACA hasil.html)
+    localStorage.setItem("stressScore", percent);
+
+    // PINDAH KE EMAIL
+    window.location.href = "email.html";
+}
+
+// ================= INIT =================
+loadQuestion();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Hasil Tes Kesehatan Mental</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+<style>
+* {
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #c9f3ff, #e8fbff);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.card {
+  width: 820px;
+  background: #ffffff;
+  padding: 50px;
+  border-radius: 30px;
+  box-shadow: 0 25px 50px rgba(0,0,0,0.15);
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.subtitle {
+  text-align: center;
+  color: #555;
+  margin-bottom: 10px;
+}
+
+/* PROGRESS BAR */
+.bar-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.progress-wrapper {
+  background: #e6e6e6;
+  height: 14px;
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  width: 0%;
+  border-radius: 20px;
+  transition: width 1.2s ease;
+}
+
+/* RESULT */
+.result {
+  text-align: center;
+  font-size: 28px;
+  font-weight: 600;
+  margin: 30px 0 20px;
+}
+
+.desc-box {
+  background: #eef9ff;
+  padding: 25px;
+  border-radius: 18px;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.disclaimer {
+  text-align: center;
+  font-size: 13px;
+  color: #666;
+}
+
+/* BUTTON */
+.action-buttons {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.action-buttons button {
+  padding: 10px 22px;
+  border-radius: 22px;
+  border: none;
+  background: #6f8cff;
+  color: #fff;
+  cursor: pointer;
+  font-size: 14px;
+  margin: 0 6px;
+}
+
+.action-buttons button:hover {
+  background: #5a76e6;
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+  <h1>Hasil Tes Kesehatan Mental</h1>
+
+  <p class="subtitle" id="userInfo"></p>
+
+  <p class="subtitle">
+    Berikut adalah gambaran kondisi kesehatan mental Anda saat ini
+  </p>
+
+  <div class="bar-header">
+    <span>Tingkat Stres Emosional</span>
+    <span id="percentText">0%</span>
+  </div>
+
+  <div class="progress-wrapper">
+    <div id="progressBar" class="progress-bar"></div>
+  </div>
+
+  <div id="resultText" class="result"></div>
+  <div id="descBox" class="desc-box"></div>
+
+  <p class="disclaimer">
+    *Hasil ini bukan diagnosis medis. Jika merasa membutuhkan bantuan,
+    silakan hubungi tenaga profesional.
+  </p>
+
+  <div class="action-buttons">
+    <button onclick="kembaliKeBeranda()">Kembali ke Beranda</button>
+    <button onclick="window.location.href='riwayat.html'">Lihat Riwayat Lengkap</button>
+  </div>
+</div>
+
+<script>
+function kembaliKeBeranda() {
+  sessionStorage.clear();
+  window.location.href = "tes3.html";
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+
+  /* ===== DATA USER ===== */
+  const userName  = localStorage.getItem("userName") || "Pengguna";
+  const userEmail = localStorage.getItem("userEmail");
+
+  const userInfo = document.getElementById("userInfo");
+  userInfo.innerText = userEmail
+    ? `Hasil tes atas nama ${userName} (${userEmail})`
+    : "Hasil tes pengguna";
+
+  /* ===== AMBIL SKOR ===== */
+  let stressScore = Number(localStorage.getItem("stressScore"));
+  if (isNaN(stressScore)) stressScore = 0;
+
+  const bar = document.getElementById("progressBar");
+  const percentText = document.getElementById("percentText");
+  const resultText = document.getElementById("resultText");
+  const descBox = document.getElementById("descBox");
+
+  let statusText = "";
+  let barColor = "";
+
+  if (stressScore <= 30) {
+    statusText = "Stres Rendah 😊";
+    barColor = "#4cd964";
+    descBox.innerText =
+      "Kondisi emosional Anda tergolong stabil dalam menjalani perkuliahan.";
+  } else if (stressScore <= 70) {
+    statusText = "Stres Sedang 😐";
+    barColor = "#f1c40f";
+    descBox.innerText =
+      "Anda menunjukkan tanda stres ringan hingga sedang yang berkaitan dengan aktivitas perkuliahan.";
+  } else {
+    statusText = "Stres Tinggi 😰";
+    barColor = "#ff6b6b";
+    descBox.innerText =
+      "Terdapat indikasi stres tinggi yang kemungkinan dipicu oleh tekanan akademik.";
+  }
+
+  resultText.innerText = statusText;
+  resultText.style.color = barColor;
+
+  setTimeout(() => {
+    bar.style.width = stressScore + "%";
+    bar.style.background = barColor;
+    percentText.innerText = stressScore + "%";
+  }, 200);
+
+  /* ===== SIMPAN RIWAYAT (ANTI DUPLIKAT) ===== */
+  if (userEmail && !sessionStorage.getItem("savedOnce")) {
+    const historyKey = "stressHistory_" + userEmail;
+    let history = JSON.parse(localStorage.getItem(historyKey)) || [];
+
+    const now = new Date();
+    const tanggal =
+      now.toLocaleDateString("id-ID", {
+        day: "2-digit",
+        month: "long",
+        year: "numeric"
+      }) + " " +
+      now.toLocaleTimeString("id-ID", {
+        hour: "2-digit",
+        minute: "2-digit"
+      });
+
+    history.unshift({
+      tanggal: tanggal,
+      status: statusText,
+      skor: stressScore
+    });
+
+    localStorage.setItem(historyKey, JSON.stringify(history));
+    sessionStorage.setItem("savedOnce", "true");
+  }
+});
+</script>
+
+</body>
+</html>
