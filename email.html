@@ -1,181 +1,141 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kirim Hasil Tes</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kirim Hasil Tes</title>
 
-  <!-- GOOGLE FONT -->
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 
-  <!-- EMAILJS CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
 
-  <!-- INIT EMAILJS -->
-  <script>
-    (function () {
-      emailjs.init("mZtFDMjjn4mOONwnT"); // PUBLIC KEY
-    })();
-  </script>
+<script>
+(function () {
+  emailjs.init("mZtFDMjjn4mOONwnT"); // PUBLIC KEY
+})();
+</script>
 
-  <style>
-    * {
-      box-sizing: border-box;
-      font-family: 'Poppins', sans-serif;
-    }
+<style>
+* {
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
+}
 
-    body {
-      margin: 0;
-      height: 100vh;
-      background: linear-gradient(135deg, #c9f3ff, #e8fbff);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
+body {
+  margin: 0;
+  height: 100vh;
+  background: linear-gradient(135deg, #c9f3ff, #e8fbff);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 
-    .card {
-      width: 420px;
-      background: #ffffff;
-      padding: 40px;
-      border-radius: 20px;
-      text-align: center;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.12);
-      animation: fadeUp 0.8s ease;
-    }
+.card {
+  width: 420px;
+  background: #ffffff;
+  padding: 40px;
+  border-radius: 20px;
+  text-align: center;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.12);
+}
 
-    .card h2 {
-      margin-bottom: 8px;
-      font-weight: 600;
-    }
+input {
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 1px solid #ccc;
+  font-size: 15px;
+  margin-bottom: 15px;
+}
 
-    .card p {
-      font-size: 14px;
-      color: #666;
-      margin-bottom: 25px;
-    }
+button {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 30px;
+  background: #6f8cff;
+  color: #fff;
+  font-size: 16px;
+  cursor: pointer;
+}
 
-    .input-group {
-      margin-bottom: 15px;
-    }
-
-    input {
-      width: 100%;
-      padding: 14px 16px;
-      border-radius: 12px;
-      border: 1px solid #ccc;
-      font-size: 15px;
-      outline: none;
-      transition: border 0.3s;
-    }
-
-    input:focus {
-      border-color: #6f8cff;
-    }
-
-    button {
-      width: 100%;
-      padding: 14px;
-      margin-top: 10px;
-      border: none;
-      border-radius: 30px;
-      background: #6f8cff;
-      color: #ffffff;
-      font-size: 16px;
-      cursor: pointer;
-      transition: background 0.3s, transform 0.2s;
-    }
-
-    button:hover {
-      background: #5a76e6;
-      transform: translateY(-2px);
-    }
-
-    .status {
-      margin-top: 15px;
-      font-size: 14px;
-      min-height: 18px;
-    }
-
-    @keyframes fadeUp {
-      from {
-        opacity: 0;
-        transform: translateY(30px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-  </style>
+.status {
+  margin-top: 15px;
+  font-size: 14px;
+}
+</style>
 </head>
 
 <body>
 
-  <div class="card">
-    <h2>Kirim Hasil Tes</h2>
-    <p>Masukkan email untuk menerima hasil tes kesehatan mental</p>
+<div class="card">
+  <h2>Kirim Hasil Tes</h2>
+  <p>Masukkan email untuk menerima hasil tes</p>
 
-    <div class="input-group">
-      <input type="text" id="name" placeholder="Nama Lengkap">
-    </div>
+  <input type="text" id="name" placeholder="Nama Lengkap">
+  <input type="text" id="fakultas" placeholder="Fakultas">
+  <input type="email" id="email" placeholder="Email">
 
-    <div class="input-group">
-      <input type="text" id="fakultas" placeholder="Fakultas">
-    </div>
-
-    <div class="input-group">
-      <input type="email" id="email" placeholder="Email">
-    </div>
-
-    <button onclick="kirimEmail()">KIRIM</button>
-
-    <div class="status" id="status"></div>
-  </div>
+  <button onclick="kirimEmail()">KIRIM</button>
+  <div class="status" id="status"></div>
+</div>
 
 <script>
 function kirimEmail() {
   const nama     = document.getElementById("name").value.trim();
   const fakultas = document.getElementById("fakultas").value.trim();
   const email    = document.getElementById("email").value.trim();
-  const status   = document.getElementById("status");
+  const statusEl = document.getElementById("status");
 
   if (!nama || !fakultas || !email) {
-    status.style.color = "red";
-    status.innerText = "Nama, fakultas, dan email wajib diisi!";
+    statusEl.style.color = "red";
+    statusEl.innerText = "Semua field wajib diisi.";
     return;
   }
 
-  // 🔥 SIMPAN USER KE LOCALSTORAGE (INI YANG HILANG)
+  // ===== AMBIL HASIL TES =====
+  const stressScore  = localStorage.getItem("stressScore");
+  const stressStatus = localStorage.getItem("stressStatus");
+
+  if (!stressScore || !stressStatus) {
+    statusEl.style.color = "red";
+    statusEl.innerText = "Hasil tes tidak ditemukan. Silakan ulangi tes.";
+    return;
+  }
+
+  // ===== SIMPAN USER =====
   localStorage.setItem("userName", nama);
   localStorage.setItem("userEmail", email);
 
-  status.style.color = "#555";
-  status.innerText = "Mengirim email...";
+  statusEl.style.color = "#555";
+  statusEl.innerText = "Mengirim email...";
 
   emailjs.send(
     "service_22",
     "template_9fievai",
     {
       name: nama,
-      email: email
+      email: email,
+      fakultas: fakultas,
+      stress_score: stressScore + "%",
+      stress_status: stressStatus
     }
   )
   .then(() => {
-    status.style.color = "green";
-    status.innerText = "Email berhasil dikirim! Mengalihkan ke hasil...";
+    statusEl.style.color = "green";
+    statusEl.innerText = "Email berhasil dikirim!";
 
     setTimeout(() => {
       window.location.href = "hasil.html";
     }, 1000);
   })
-  .catch(() => {
-    status.style.color = "red";
-    status.innerText = "Gagal mengirim email.";
+  .catch((err) => {
+    console.error(err);
+    statusEl.style.color = "red";
+    statusEl.innerText = "Gagal mengirim email.";
   });
 }
 </script>
 
-
 </body>
 </html>
-
